@@ -38,12 +38,12 @@ func main() {
   var count Count
 
   e.GET("/", func(c echo.Context) error {
-    return c.Render(http.StatusOK, "index.html", count)
+    return c.Render(http.StatusOK, "index", count)
   })
 
   e.POST("/count", func(c echo.Context) error {
     count.Count++
-    return c.Render(http.StatusOK, "index.html", count)
+    return c.Render(http.StatusOK, "count", count)
   })
 
   e.Logger.Fatal(e.Start(":1323"))
