@@ -34,9 +34,14 @@ func main() {
   // middlewares
   e.Use(middleware.Logger())
 
+  // Routes
   var count Count
 
   e.GET("/", func(c echo.Context) error {
+    return c.Render(http.StatusOK, "index.html", count)
+  })
+
+  e.POST("/count", func(c echo.Context) error {
     count.Count++
     return c.Render(http.StatusOK, "index.html", count)
   })
