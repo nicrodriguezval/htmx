@@ -3,3 +3,6 @@
 /node_modules/
 /views/**/*.go
 
+# air
+.air.toml
+
