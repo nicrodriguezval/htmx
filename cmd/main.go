@@ -10,41 +10,70 @@ import (
 )
 
 type Template struct {
-  templates *template.Template
+	templates *template.Template
 }
 
 func (t *Template) Render(w io.Writer, name string, data any, c echo.Context) error {
-  return t.templates.ExecuteTemplate(w, name, data)
+	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 func NewTemplate() *Template {
-  return &Template{
-    templates: template.Must(template.ParseGlob("views/*.html")),
-  }
+	return &Template{
+		templates: template.Must(template.ParseGlob("views/*.html")),
+	}
 }
 
-type Count struct {
-  Count int
+type Contact struct {
+	Name  string
+	Email string
+}
+
+func newContact(name, email string) Contact {
+	return Contact{
+		Name:  name,
+		Email: email,
+	}
+}
+
+type Contacts = []Contact
+
+type Data struct {
+	Contacts Contacts
+}
+
+func newData() Data {
+	return Data{
+		Contacts: Contacts{
+			newContact("Jonh", "jd@email.com"),
+			newContact("Clara", "cd@email.com"),
+		},
+	}
 }
 
 func main() {
 	e := echo.New()
-  e.Renderer = NewTemplate()
+	e.Renderer = NewTemplate()
 
-  // middlewares
-  e.Use(middleware.Logger())
+	// Middlewares
+	e.Use(middleware.Logger())
 
-  // Routes
-  var count Count
+	// Data
+	data := newData()
 
-  e.GET("/", func(c echo.Context) error {
-    return c.Render(http.StatusOK, "index", count)
-  })
+	// Routes
 
-  e.POST("/count", func(c echo.Context) error {
-    count.Count++
-    return c.Render(http.StatusOK, "count", count)
-  })
+	e.GET("/", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "index", data)
+	})
 
-  e.Logger.Fatal(e.Start(":1323"))
+	e.POST("/contacts", func(c echo.Context) error {
+		name := c.FormValue("name")
+		email := c.FormValue("email")
+
+		data.Contacts = append(data.Contacts, newContact(name, email))
+
+		return c.Render(http.StatusOK, "index", data)
+	})
+
+	e.Logger.Fatal(e.Start(":1323"))
 }

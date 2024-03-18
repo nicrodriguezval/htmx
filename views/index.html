@@ -21,8 +21,8 @@
 
 {{ block "form" . }}
 <form hx-post="/contacts">
-  name: <input type="text" name="name" />
-  email: <input type="email" name="email" />
+  Name: <input type="text" name="name" />
+  Email: <input type="email" name="email" />
   <button type="submit">Create contact</button>
 </form>
 {{ end }}
@@ -31,8 +31,8 @@
 <div style="display: flex; flex-direction: column;">
   {{ range .Contacts }}
   <div>
-    Name: <span>{{ .Name }}</span>
-    Email <span>{{ .Email }}</span>
+    <strong>Name:</strong> <span>{{ .Name }}</span>
+    <strong>Email:</strong> <span>{{ .Email }}</span>
   </div>
   {{ end }}
 </div>
