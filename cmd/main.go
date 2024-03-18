@@ -41,12 +41,46 @@ type Data struct {
 	Contacts Contacts
 }
 
+func (d *Data) hasEmail(email string) bool {
+	for i := 0; i < len(d.Contacts); i++ {
+		if c := d.Contacts[i]; c.Email == email {
+			return true
+		}
+	}
+
+	return false
+}
+
 func newData() Data {
 	return Data{
 		Contacts: Contacts{
 			newContact("Jonh", "jd@email.com"),
 			newContact("Clara", "cd@email.com"),
 		},
+	}
+}
+
+type FormData struct {
+	Values map[string]string
+	Errors map[string]string
+}
+
+func newFormData() FormData {
+	return FormData{
+		Values: make(map[string]string),
+		Errors: make(map[string]string),
+	}
+}
+
+type Page struct {
+	Form FormData
+	Data Data
+}
+
+func newPage() Page {
+	return Page{
+		Data: newData(),
+		Form: newFormData(),
 	}
 }
 
@@ -58,21 +92,30 @@ func main() {
 	e.Use(middleware.Logger())
 
 	// Data
-	data := newData()
+	page := newPage()
 
 	// Routes
 
 	e.GET("/", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "index", data)
+		return c.Render(http.StatusOK, "index", page)
 	})
 
 	e.POST("/contacts", func(c echo.Context) error {
 		name := c.FormValue("name")
 		email := c.FormValue("email")
 
-		data.Contacts = append(data.Contacts, newContact(name, email))
+		if page.Data.hasEmail(email) {
+			formData := newFormData()
+			formData.Values["name"] = name
+			formData.Values["email"] = email
+			formData.Errors["email"] = "Email already exists"
 
-		return c.Render(http.StatusOK, "index", data)
+			return c.Render(http.StatusUnprocessableEntity, "form", formData)
+		}
+
+		page.Data.Contacts = append(page.Data.Contacts, newContact(name, email))
+
+		return c.Render(http.StatusOK, "display", page.Data)
 	})
 
 	e.Logger.Fatal(e.Start(":1323"))

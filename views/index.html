@@ -14,16 +14,41 @@
 
 <body>
 </body>
-  {{ template "form" . }}
-  {{ template "display" . }}
+  {{ template "form" .Form }}
+  <hr />
+  {{ template "display" .Data }}
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('htmx:beforeSwap', e => {
+      if (e.detail.xhr.status === 422) {
+        e.detail.shouldSwap = true;
+        e.detail.error = false;
+      }
+    });
+  });
+  </script>
 </html>
 {{ end }}
 
 {{ block "form" . }}
-<form hx-post="/contacts">
-  Name: <input type="text" name="name" />
-  Email: <input type="email" name="email" />
-  <button type="submit">Create contact</button>
+<form hx-post="/contacts" hx-swap="outerHTML">
+  Name: <input 
+    {{ if .Values.name }} value="{{ .Values.name }}" {{ end }}
+    type="text"
+    name="name"
+  />
+  Email: <input
+    {{ if .Values.email }} value="{{ .Values.email }}" {{ end }}
+    type="email"
+    name="email" 
+  />
+
+  {{ if .Errors.email }}
+  <div style="color: red;">{{ .Errors.email }}</div>
+  {{ end }}
+
+  <button type="submit" style="display: block;">Create contact</button>
 </form>
 {{ end }}
 
