@@ -45,7 +45,7 @@
   />
 
   {{ if .Errors.email }}
-  <div style="color: red;">{{ .Errors.email }}</div>
+    <div style="color: red;">{{ .Errors.email }}</div>
   {{ end }}
 
   <button type="submit" style="display: block;">Create contact</button>
@@ -53,12 +53,22 @@
 {{ end }}
 
 {{ block "display" . }}
-<div style="display: flex; flex-direction: column;">
-  {{ range .Contacts }}
+  <div id="contacts" style="display: flex; flex-direction: column;">
+    {{ range .Contacts }}
+      {{ template "contact" . }}
+    {{ end }}
+  </div>
+{{ end }}
+
+{{ block "contact" . }}
   <div>
     <strong>Name:</strong> <span>{{ .Name }}</span>
     <strong>Email:</strong> <span>{{ .Email }}</span>
   </div>
-  {{ end }}
-</div>
+{{ end }}
+
+{{ block "oob-contact" . }}
+  <div id="contacts" hx-swap-oob="afterbegin" >
+    {{ template "contact" . }}
+  </div>
 {{ end }}
