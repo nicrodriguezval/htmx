@@ -12,22 +12,39 @@
     crossorigin="anonymous"></script>
 </head>
 
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+  }
+</style>
+
 <body>
-</body>
-  {{ template "form" .Form }}
-  <hr />
-  {{ template "display" .Data }}
+  <main>
+    {{ template "form" .Form }}
+    <hr />
+    {{ template "display" .Data }}
+  </main>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.body.addEventListener('htmx:beforeSwap', e => {
-      if (e.detail.xhr.status === 422) {
-        e.detail.shouldSwap = true;
-        e.detail.error = false;
-      }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.addEventListener('htmx:beforeSwap', e => {
+        if (e.detail.xhr.status === 422) {
+          e.detail.shouldSwap = true;
+          e.detail.error = false;
+        }
+      });
     });
-  });
   </script>
+</body>
 </html>
 {{ end }}
 
@@ -61,15 +78,20 @@
 {{ end }}
 
 {{ block "contact" . }}
-  <div style="display: flex;">
-    <div style="width: 1em; cursor: pointer;">
+  <div id="contact-{{ .Id }}" style="display: flex; gap: 1rem;">
+    <div
+      style="width: 1em; cursor: pointer;"
+      hx-target="#contact-{{ .Id }}"
+      hx-swap="outerHTML"
+      hx-delete="/contacts/{{ .Id }}"
+    >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <path fill="none" d="M0 0h24v24H0z"/>
         <path d="M4 2h16a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM3 6h18v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6zm3 3v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0z"/>
       </svg>
     </div>
-    <strong>Name:</strong> <span>{{ .Name }}</span>
-    <strong>Email:</strong> <span>{{ .Email }}</span>
+    <p><strong>Name:</strong> <span>{{ .Name }}</span></p>
+    <p><strong>Email:</strong> <span>{{ .Email }}</span></p>
   </div>
 {{ end }}
 

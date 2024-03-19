@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,15 +24,21 @@ func NewTemplate() *Template {
 	}
 }
 
+var id int
+
 type Contact struct {
 	Name  string
 	Email string
+	Id    int
 }
 
 func newContact(name, email string) Contact {
+	id++
+
 	return Contact{
 		Name:  name,
 		Email: email,
+		Id:    id,
 	}
 }
 
@@ -49,6 +56,15 @@ func (d *Data) hasEmail(email string) bool {
 	}
 
 	return false
+}
+
+func (d *Data) deleteContact(id int) {
+  for i := 0; i < len(d.Contacts); i++ {
+    if c := d.Contacts[i]; c.Id == id {
+      d.Contacts = append(d.Contacts[:i], d.Contacts[i+1:]...)
+      return
+    }
+  }
 }
 
 func newData() Data {
@@ -119,6 +135,18 @@ func main() {
 		c.Render(http.StatusOK, "form", newFormData())
 		return c.Render(http.StatusOK, "oob-contact", contact)
 	})
+
+  e.DELETE("/contacts/:id", func(c echo.Context) error {
+    idStr := c.Param("id")
+    id, err := strconv.Atoi(idStr)
+    if err != nil {
+      return c.String(http.StatusBadRequest, "Invalid id")
+    }
+
+    page.Data.deleteContact(id);
+
+    return c.NoContent(http.StatusOK)
+  })
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
