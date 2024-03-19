@@ -41,7 +41,7 @@
   Email: <input
     {{ if .Values.email }} value="{{ .Values.email }}" {{ end }}
     type="email"
-    name="email" 
+    name="email"
   />
 
   {{ if .Errors.email }}
@@ -61,7 +61,13 @@
 {{ end }}
 
 {{ block "contact" . }}
-  <div>
+  <div style="display: flex;">
+    <div style="width: 1em; cursor: pointer;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path fill="none" d="M0 0h24v24H0z"/>
+        <path d="M4 2h16a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM3 6h18v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6zm3 3v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0z"/>
+      </svg>
+    </div>
     <strong>Name:</strong> <span>{{ .Name }}</span>
     <strong>Email:</strong> <span>{{ .Email }}</span>
   </div>
