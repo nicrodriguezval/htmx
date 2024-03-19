@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -59,12 +60,12 @@ func (d *Data) hasEmail(email string) bool {
 }
 
 func (d *Data) deleteContact(id int) {
-  for i := 0; i < len(d.Contacts); i++ {
-    if c := d.Contacts[i]; c.Id == id {
-      d.Contacts = append(d.Contacts[:i], d.Contacts[i+1:]...)
-      return
-    }
-  }
+	for i := 0; i < len(d.Contacts); i++ {
+		if c := d.Contacts[i]; c.Id == id {
+			d.Contacts = append(d.Contacts[:i], d.Contacts[i+1:]...)
+			return
+		}
+	}
 }
 
 func newData() Data {
@@ -102,7 +103,10 @@ func newPage() Page {
 
 func main() {
 	e := echo.New()
+
 	e.Renderer = NewTemplate()
+	e.Static("/images", "images")
+	e.Static("/css", "css")
 
 	// Middlewares
 	e.Use(middleware.Logger())
@@ -136,17 +140,19 @@ func main() {
 		return c.Render(http.StatusOK, "oob-contact", contact)
 	})
 
-  e.DELETE("/contacts/:id", func(c echo.Context) error {
-    idStr := c.Param("id")
-    id, err := strconv.Atoi(idStr)
-    if err != nil {
-      return c.String(http.StatusBadRequest, "Invalid id")
-    }
+	e.DELETE("/contacts/:id", func(c echo.Context) error {
+		time.Sleep(2 * time.Second)
 
-    page.Data.deleteContact(id);
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			return c.String(http.StatusBadRequest, "Invalid id")
+		}
 
-    return c.NoContent(http.StatusOK)
-  })
+		page.Data.deleteContact(id)
+
+		return c.NoContent(http.StatusOK)
+	})
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

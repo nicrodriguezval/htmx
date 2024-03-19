@@ -6,6 +6,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <!--CSS-->
+  <link rel="stylesheet" href="/css/index.css">
   <!--HTMX-->
   <script src="https://unpkg.com/htmx.org@1.9.11"
     integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
@@ -45,24 +47,17 @@
     });
   </script>
 </body>
+
 </html>
 {{ end }}
 
 {{ block "form" . }}
 <form hx-post="/contacts" hx-swap="outerHTML">
-  Name: <input 
-    {{ if .Values.name }} value="{{ .Values.name }}" {{ end }}
-    type="text"
-    name="name"
-  />
-  Email: <input
-    {{ if .Values.email }} value="{{ .Values.email }}" {{ end }}
-    type="email"
-    name="email"
-  />
+  Name: <input {{ if .Values.name }} value="{{ .Values.name }}" {{ end }} type="text" name="name" />
+  Email: <input {{ if .Values.email }} value="{{ .Values.email }}" {{ end }} type="email" name="email" />
 
   {{ if .Errors.email }}
-    <div style="color: red;">{{ .Errors.email }}</div>
+  <div style="color: red;">{{ .Errors.email }}</div>
   {{ end }}
 
   <button type="submit" style="display: block;">Create contact</button>
@@ -70,33 +65,39 @@
 {{ end }}
 
 {{ block "display" . }}
-  <div id="contacts" style="display: flex; flex-direction: column;">
-    {{ range .Contacts }}
-      {{ template "contact" . }}
-    {{ end }}
-  </div>
+<div id="contacts" style="display: flex; flex-direction: column;">
+  {{ range .Contacts }}
+  {{ template "contact" . }}
+  {{ end }}
+</div>
 {{ end }}
 
 {{ block "contact" . }}
-  <div id="contact-{{ .Id }}" style="display: flex; gap: 1rem;">
-    <div
-      style="width: 1em; cursor: pointer;"
-      hx-target="#contact-{{ .Id }}"
-      hx-swap="outerHTML"
-      hx-delete="/contacts/{{ .Id }}"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <path fill="none" d="M0 0h24v24H0z"/>
-        <path d="M4 2h16a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM3 6h18v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6zm3 3v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0z"/>
-      </svg>
-    </div>
-    <p><strong>Name:</strong> <span>{{ .Name }}</span></p>
-    <p><strong>Email:</strong> <span>{{ .Email }}</span></p>
+<div id="contact-{{ .Id }}" class="contact" style="display: flex; gap: 0.75rem;">
+  <div
+    style="width: 1em; cursor: pointer;"
+    hx-target="#contact-{{ .Id }}"
+    hx-swap="outerHTML"
+    hx-delete="/contacts/{{ .Id }}"
+    hx-indicator="#ci-{{ .Id }}"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path fill="none" d="M0 0h24v24H0z" />
+      <path
+        d="M4 2h16a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM3 6h18v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6zm3 3v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0zm5 0v9a1 1 0 0 0 2 0V9a1 1 0 0 0-2 0z" />
+    </svg>
   </div>
+  <p><strong>Name:</strong> <span>{{ .Name }}</span></p>
+  <p><strong>Email:</strong> <span>{{ .Email }}</span></p>
+
+  <div id="ci-{{ .Id }}" class="htmx-indicator">
+    <img src="/images/bars.svg" alt="loading" style="width: 1em;">
+  </div>
+</div>
 {{ end }}
 
 {{ block "oob-contact" . }}
-  <div id="contacts" hx-swap-oob="afterbegin" >
-    {{ template "contact" . }}
-  </div>
+<div id="contacts" hx-swap-oob="afterbegin">
+  {{ template "contact" . }}
+</div>
 {{ end }}
